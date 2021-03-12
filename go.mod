@@ -1,4 +1,4 @@
-module gitshit.r3/braddschick/simpdf
+module github.com/braddschick/simpdf
 
 go 1.15
 

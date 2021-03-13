@@ -99,7 +99,7 @@ func (s *SimPDF) Parser(style string, align models.Alignments, text string) stri
 		html := s.PDF.HTMLBasicNew()
 		sty, _ := s.StyleName(style)
 		s.SetStyle(sty, false)
-		html.Write(sty.LineSize, strings.Replace(align.ToHTML(), "$1", text, -1))
+		html.Write(sty.LineSize, strings.Replace(align.ToHTML(), "$1", out, -1))
 		return ""
 	}
 	return text

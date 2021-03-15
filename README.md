@@ -14,3 +14,9 @@ in this package to make life easier from making a simple automated report or som
 ## Things are different here
 
 Once you look at this package contents you will see things are different here. That doesn't mean they are bad just they are different.
+
+## Examples
+
+See the [Examples](./examples) directory for various examples of how to use SimPDF. 
+
+- [Simple Example](./examples/simple.go) - Basic operations Write/Center, Alignment, Instantiation, and completion

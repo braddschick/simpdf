@@ -36,8 +36,9 @@ func (i *Images) Validate() bool {
 	return false
 }
 
-// New is a function of Images and allows for the automatic validation of the Image file
+// NewImage is a function that creates an images object and allows for the automatic validation of the Image file
 func (i *Images) New(filePath string, width, height float64) error {
+	// var i Images
 	i.FilePath = filePath
 	i.Width = width
 	i.Height = height

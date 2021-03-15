@@ -78,7 +78,7 @@ func (s *SimPDF) AddTableHeader(table Tables, fixWidth float64) {
 		align, str := BreakTableAlignment(r)
 		s.PDF.CellFormat(w, table.HeaderStyle.LineSize, str, b, 0, align, true, 0, "")
 	}
-	s.AddNewLine()
+	s.AddNewLine(table.HeaderStyle.LineSize)
 }
 
 // AddTableRows Adds the table rows to the PDF document. If fixWidth is not 0 then
@@ -104,7 +104,7 @@ func (s *SimPDF) AddTableRows(table Tables, fixWidth float64) {
 			align, str := BreakTableAlignment(n)
 			s.PDF.CellFormat(w, table.RowStyle.LineSize, str, b, 0, align, true, 0, "")
 		}
-		s.AddNewLine()
+		s.AddNewLine(table.RowStyle.LineSize)
 	}
 	sty, err := s.StyleName("Normal")
 	internal.IfError("AddTableRows secure", err, false)
@@ -119,15 +119,15 @@ func (s *SimPDF) AddTable(table Tables, altRowColor models.Styles, fixedWidth fl
 		table.HasAlternating = true
 		table.AlternatingRowStyle = altRowColor
 	}
-	s.AddNewLine()
-	s.AddNewLine()
+	s.AddNewLine(0)
+	s.AddNewLine(0)
 	table.MaxColWidth = s.TableColumnWidth(table)
 	s.AddTableHeader(table, fixedWidth)
 	s.AddTableRows(table, fixedWidth)
 	style, err := s.StyleName("Normal")
 	internal.IfError("AddTable public", err, false)
 	s.fontReset(style)
-	s.AddNewLine()
+	s.AddNewLine(0)
 }
 
 // DistributeColumnsEvenly returns a fixed width size that would allow the columns to be evenly

@@ -110,8 +110,12 @@ func (s *SimPDF) StyleName(name string) (models.Styles, error) {
 }
 
 // AddNewLine Adds a new line to the PDF document the same line height as previously used.
-func (s *SimPDF) AddNewLine() {
-	s.PDF.Ln(-1)
+func (s *SimPDF) AddNewLine(size float64) {
+	if size == 0 {
+		s.PDF.Ln(-1)
+	} else {
+		s.PDF.Ln(size)
+	}
 }
 
 // DrawBottomLine Draws a simple bottom line under text as directed by the style given.
@@ -247,7 +251,7 @@ func (s *SimPDF) ChangeFont(style models.Styles) {
 // Useful for adding a new line, maybe a bookmark, or anything else.
 func (s *SimPDF) HeadingStart(styleType, text string) {
 	if !strings.Contains(strings.ToLower(styleType), "subtitle") {
-		s.AddNewLine()
+		s.AddNewLine(0)
 		// s.AddBookmark(styleType, text)
 	}
 }
@@ -256,7 +260,7 @@ func (s *SimPDF) HeadingStart(styleType, text string) {
 // Useful for adding a new line, maybe a bookmark, or anything else.
 func (s *SimPDF) HeadingEnd(styleType string) {
 	if !strings.Contains(strings.ToLower(styleType), "title") {
-		s.AddNewLine()
+		s.AddNewLine(0)
 	}
 }
 

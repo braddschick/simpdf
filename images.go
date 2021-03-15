@@ -3,17 +3,18 @@ package simpdf
 import (
 	"errors"
 	"fmt"
+	"math"
 	"strings"
 
 	"github.com/braddschick/simpdf/internal"
 	"github.com/jung-kurt/gofpdf"
 )
 
-// Additions is used for any additions to a document such as Images
-type Additions interface {
-	New(filePath string, width, height float64) error
-	Validate() bool
-}
+// // Additions is used for any additions to a document such as Images
+// type Additions interface {
+// 	New(filePath string, width, height float64) error
+// 	Validate() bool
+// }
 
 // Images struct for Simplifing the addition of an image to the PDF document.
 type Images struct {
@@ -36,17 +37,31 @@ func (i *Images) Validate() bool {
 	return false
 }
 
+// ChangeWidth will change the images width and also modify the corresponding height to ensure proportions are correct.
+func (i *Images) ChangeWidth(w float64) {
+	H := math.Round((i.Height * w) / i.Width)
+	i.Height = H
+	i.Width = w
+}
+
+// ChangeHeight will change the images height and also modify the corresponding width to ensure proportions are correct.
+func (i *Images) ChangeHeight(h float64) {
+	W := math.Round((i.Width * h) / i.Height)
+	i.Height = h
+	i.Width = W
+}
+
 // NewImage is a function that creates an images object and allows for the automatic validation of the Image file
-func (i *Images) New(filePath string, width, height float64) error {
-	// var i Images
+func NewImage(filePath string, width, height float64) (Images, error) {
+	var i Images
 	i.FilePath = filePath
 	i.Width = width
 	i.Height = height
 	i.Extension = internal.FileExtension(filePath)
 	if !i.Validate() {
-		return errors.New("failed to find the image or was not allowed to access image file")
+		return Images{}, errors.New("failed to find the image or was not allowed to access image file")
 	}
-	return nil
+	return i, nil
 }
 
 // AddImageXY Simply allows the adding of an image to the specifc X Y coordinates
@@ -65,7 +80,7 @@ func (s *SimPDF) AddImageCurrent(image Images) {
 	x, y := s.PDF.GetXY()
 	width := s.PageWidth()
 	if (s.Margin.Left+s.Margin.Right)+(x+image.Width) > width {
-		s.AddNewLine()
+		s.AddNewLine(0)
 		x, y = s.PDF.GetXY()
 	} else {
 		x = x + 5

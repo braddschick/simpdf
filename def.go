@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math"
 	"os"
 	"path/filepath"
 	"strings"
@@ -267,6 +268,27 @@ func (s *SimPDF) HeadingEnd(styleType string) {
 // AddMargins Adds margins to the current PDF document based upon the margin variable presented.
 func (s *SimPDF) AddMargins(margin models.Margins) {
 	s.PDF.SetMargins(margin.Left, margin.Top, margin.Right)
+}
+
+func (s *SimPDF) WriteImageInset(styleType string, align models.Alignments, text, imgPosition string, image Images) {
+	tW := s.PageWidth() - s.Margin.Left - s.Margin.Right
+	pos := strings.Split(strings.ToLower(imgPosition), "")
+	var cellHeight, cellWidth float64
+	if pos[1] == "r" || pos[1] == "l" {
+		cellWidth = tW - image.Width
+	} else {
+		// figure centering out later
+		cellWidth = tW - image.Width
+	}
+	cellHeight = image.Height + 20
+	clean := s.Parser(styleType, align, text)
+	style, _ := s.StyleName(styleType)
+	s.SetStyle(style, true)
+	totalW := s.StringWidth(clean)
+	if totalW > cellWidth {
+		cellHeight = style.LineSize * (math.Round((totalW-cellWidth)/cellWidth) + 1)
+	}
+
 }
 
 // WriteCenter centers the current position of X,Y coordinates in the PDF document and then writes

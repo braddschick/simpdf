@@ -275,7 +275,7 @@ func (s *SimPDF) WriteImageInset(styleType string, align models.Alignments, text
 	pos := strings.Split(strings.ToLower(imgPosition), "")
 	var cX float64
 	s.AddNewLine(-1)
-	iWpt, _ := image.PointsSize()
+	iWpt, iHpt := image.PointsSize()
 	if pos[1] == "r" || pos[1] == "l" {
 		if pos[1] == "r" {
 			tW := s.PageWidth()
@@ -292,6 +292,10 @@ func (s *SimPDF) WriteImageInset(styleType string, align models.Alignments, text
 	s.AddImageXY(image, x, y)
 	s.PDF.SetX(s.Margin.Left)
 	s.Write(styleType, align, text)
+	_, y2 := s.PDF.GetXY()
+	if y+iHpt > y2 {
+		s.PDF.SetY(y + iHpt + 5)
+	}
 	s.AddNewLine(-1)
 	s.ResetMargins()
 }

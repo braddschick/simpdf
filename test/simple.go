@@ -21,7 +21,7 @@ func main() {
 	// "Title" denotes the style of text to be used. This is the name of the models.Style to utilize
 	// models.Alignments{Center: true} will center the text to the page, also can be Left: true or Right: true
 	// "This is my Title" is the text to be written out to the document
-	pdf.WriteCenter("Title", models.Alignments{Center: true}, "This is the Title \"centered\"")
+	pdf.WriteCenter("Title", models.Alignments{Center: true}, "Title \"centered\"")
 	// pdf.Write writes text in the current X, Y position of the document
 	// This is identical to pdf.WriteCenter for arguments
 	pdf.Write("Subtitle", *l, "subtitle which can be styled differently")
@@ -73,6 +73,7 @@ func main() {
 	pdf.Write("Normal", *l, "Adding an image to a \"Standard Position\" is easy as well. Top Left, _#tl#_, or Top Center, _#tc#_, or Top Right, _#tr#_, and is also available in Center or Bottom variations.")
 	pdf.Write("Normal", *l, "The little gopher is located at the \"Bottom Left\" by using _*bl*_.")
 	goImage.ChangeWidth(100)
-	pdf.AddImageStandardPosition(goImage, "bl")
+	// pdf.AddImageStandardPosition(goImage, "bl")
+	pdf.WriteImageInset("Normal", *l, "This needs to have margin left away from the image, but also look decent. _#However#_, I need to ensure it continues with a line break which is why this is so long.", "tr", goImage)
 	pdf.Finish("./simple_example.pdf")
 }

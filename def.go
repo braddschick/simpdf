@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"math"
 	"os"
 	"path/filepath"
 	"strings"
@@ -95,7 +94,7 @@ func (s *SimPDF) SetPage(pageType string, isLandscape bool) {
 func (s *SimPDF) StyleName(name string) (models.Styles, error) {
 	var out models.Styles
 	for _, t := range s.Style {
-		if strings.ToLower(t.Name) == strings.ToLower(name) {
+		if strings.EqualFold(t.Name, name) {
 			out = t
 			break
 		}
@@ -224,11 +223,7 @@ func (s *SimPDF) StringWidth(text string) float64 {
 // true equals it does pass the bottom of the page.
 // false equals it is not going to pass the bottom of the page.
 func (s *SimPDF) CheckBottom() bool {
-	cY := s.PDF.GetY()
-	if (cY + s.Margin.Bottom) > s.PageHeight() {
-		return true
-	}
-	return false
+	return (s.PDF.GetY() + s.Margin.Bottom) > s.PageHeight()
 }
 
 func (s *SimPDF) fontReset(style models.Styles) {
@@ -270,25 +265,35 @@ func (s *SimPDF) AddMargins(margin models.Margins) {
 	s.PDF.SetMargins(margin.Left, margin.Top, margin.Right)
 }
 
-func (s *SimPDF) WriteImageInset(styleType string, align models.Alignments, text, imgPosition string, image Images) {
-	tW := s.PageWidth() - s.Margin.Left - s.Margin.Right
-	pos := strings.Split(strings.ToLower(imgPosition), "")
-	var cellHeight, cellWidth float64
-	if pos[1] == "r" || pos[1] == "l" {
-		cellWidth = tW - image.Width
-	} else {
-		// figure centering out later
-		cellWidth = tW - image.Width
-	}
-	cellHeight = image.Height + 20
-	clean := s.Parser(styleType, align, text)
-	style, _ := s.StyleName(styleType)
-	s.SetStyle(style, true)
-	totalW := s.StringWidth(clean)
-	if totalW > cellWidth {
-		cellHeight = style.LineSize * (math.Round((totalW-cellWidth)/cellWidth) + 1)
-	}
+// ResetMargins changes the margins back to the original as set at instantiation.
+func (s *SimPDF) ResetMargins() {
+	s.AddMargins(s.Margin)
+}
 
+// WriteImageInset Allows for an image to be inset on the top left, tl, or at the top right, tr, as desired.
+func (s *SimPDF) WriteImageInset(styleType string, align models.Alignments, text, imgPosition string, image Images) {
+	pos := strings.Split(strings.ToLower(imgPosition), "")
+	var cX float64
+	s.AddNewLine(-1)
+	iWpt, _ := image.PointsSize()
+	if pos[1] == "r" || pos[1] == "l" {
+		if pos[1] == "r" {
+			tW := s.PageWidth()
+			cX = tW - (s.Margin.Right * 2) - iWpt
+			s.PDF.SetRightMargin((s.Margin.Right * 2) + iWpt)
+			s.PDF.SetX(cX)
+		} else {
+			cX = (s.Margin.Left * 2) + iWpt
+			s.PDF.SetLeftMargin(cX)
+			s.PDF.SetX(s.Margin.Left)
+		}
+	}
+	x, y := s.PDF.GetXY()
+	s.AddImageXY(image, x, y)
+	s.PDF.SetX(s.Margin.Left)
+	s.Write(styleType, align, text)
+	s.AddNewLine(-1)
+	s.ResetMargins()
 }
 
 // WriteCenter centers the current position of X,Y coordinates in the PDF document and then writes

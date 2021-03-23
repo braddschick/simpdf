@@ -101,6 +101,9 @@ func (s *SimPDF) AddImageStandardPosition(image Images, stdPosition string) {
 	if strings.Contains(strings.ToLower(stdPosition), "r") {
 		x = x - image.Width
 	}
+	if strings.Contains(strings.ToLower(stdPosition), "c") {
+		x = x - (image.Width / 2)
+	}
 	if strings.Contains(strings.ToLower(stdPosition), "b") {
 		y = y - image.Height
 	}

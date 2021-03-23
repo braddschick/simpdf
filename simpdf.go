@@ -53,4 +53,12 @@ type SimPDF struct {
 	Margin models.Margins
 	// PDF main PDF document from gofpdf.Pdf
 	PDF gofpdf.Pdf
+	// Title of the PDF document. Can be used as a variable for header/footer
+	Title string
+	// Author of the PDF document. Can be used as a variable for header/footer
+	Author string
+	// Keywords of the PDF document
+	Keywords string
+	// Subject for the PDF document
+	Subject string
 }

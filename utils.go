@@ -16,3 +16,31 @@ func PixelsToPoints(p float64) float64 {
 func PointsToPixels(p float64) float64 {
 	return p * (PIXEL_INCH / POINTS_INCH)
 }
+
+// IsDefault returns if the [i] supplied is a default value for its type
+func IsDefault(i interface{}) bool {
+	switch v := i.(type) {
+	case int:
+		if v == 0 {
+			return true
+		}
+		return false
+	case int32:
+		if v == 0 {
+			return true
+		}
+		return false
+	case int64:
+		if v == 0 {
+			return true
+		}
+		return false
+	case bool:
+		return !v
+	default:
+		if v == "" {
+			return true
+		}
+		return false
+	}
+}

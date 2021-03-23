@@ -24,6 +24,26 @@ func (s *SimPDF) AddStyle(styles []models.Styles) {
 	s.Style = styles
 }
 
+// Details allows the adding of additional details for the PDF document.
+func (s *SimPDF) Details(title, auth, subject, keywords string) {
+	s.Title = title
+	s.Author = auth
+	s.Subject = subject
+	s.Keywords = keywords
+	if !IsDefault(s.Title) {
+		s.PDF.SetTitle(s.Title, true)
+	}
+	if !IsDefault(s.Author) {
+		s.PDF.SetAuthor(s.Author, true)
+	}
+	if !IsDefault(s.Subject) {
+		s.PDF.SetAuthor(s.Subject, true)
+	}
+	if !IsDefault(s.Keywords) {
+		s.PDF.SetKeywords(s.Keywords, true)
+	}
+}
+
 // SetMargin sets the Margins for the PDF document.
 // Use of a default is allowed here as defaults.WordMargins()
 func (s *SimPDF) SetMargin(margin models.Margins) {

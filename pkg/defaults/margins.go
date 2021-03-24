@@ -1,8 +1,6 @@
 package defaults
 
-import (
-	"github.com/braddschick/simpdf/pkg/models"
-)
+import "github.com/braddschick/simpdf/pkg/models"
 
 var (
 	// WordMargins returns the default margins from a MS Word Document

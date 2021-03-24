@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/braddschick/simpdf/internal"
-	"github.com/jung-kurt/gofpdf"
 )
 
 // // Additions is used for any additions to a document such as Images
@@ -26,6 +25,11 @@ type Images struct {
 	Width float64
 	// Height of the image to be placed in the document
 	Height float64
+}
+
+// PointsSize returns the image size width, and height in design unit points
+func (i *Images) PointsSize() (float64, float64) {
+	return PixelsToPoints(i.Width), PixelsToPoints(i.Height)
 }
 
 // Validate will ensure the image is accessible in the file system
@@ -66,14 +70,14 @@ func NewImage(filePath string, width, height float64) (Images, error) {
 
 // AddImageXY Simply allows the adding of an image to the specifc X Y coordinates
 func (s *SimPDF) AddImageXY(image Images, x, y float64) {
-	if image.Extension == "PNG" {
-		s.PDF.ImageOptions(image.FilePath, x, y, image.Width, image.Height, false, gofpdf.ImageOptions{ImageType: image.Extension, ReadDpi: true}, 0, "")
-	} else {
-		s.PDF.Image(image.FilePath, x, y, image.Width, image.Height, false, "", 0, "")
-	}
+	// if image.Extension == "PNG" {
+	// 	s.PDF.ImageOptions(image.FilePath, x, y, image.Width, image.Height, false, gofpdf.ImageOptions{ImageType: image.Extension, ReadDpi: true}, 0, "")
+	// } else {
+	s.PDF.Image(image.FilePath, x, y, image.Width, image.Height, false, "", 0, "")
+	// }
 }
 
-// AddImageCurrent Adds the image to the current X Y coordinates with a padding of 5 pts.
+// AddImageCurrent Adds the image to the current X Y coordinates with a padding of 3 pts.
 // Error checking is in place to add a new line to the document if the image runs past the boundaries
 // of the document. If a new line has been placed any padding has been removed.
 func (s *SimPDF) AddImageCurrent(image Images) {
@@ -83,8 +87,8 @@ func (s *SimPDF) AddImageCurrent(image Images) {
 		s.AddNewLine(0)
 		x, y = s.PDF.GetXY()
 	} else {
-		x = x + 5
-		y = y + 5
+		x = x + 3
+		y = y + 3
 	}
 	s.AddImageXY(image, x, y)
 }
@@ -96,6 +100,9 @@ func (s *SimPDF) AddImageStandardPosition(image Images, stdPosition string) {
 	x, y := s.StandardPosition(stdPosition)
 	if strings.Contains(strings.ToLower(stdPosition), "r") {
 		x = x - image.Width
+	}
+	if strings.Contains(strings.ToLower(stdPosition), "c") {
+		x = x - (image.Width / 2)
 	}
 	if strings.Contains(strings.ToLower(stdPosition), "b") {
 		y = y - image.Height

@@ -9,7 +9,7 @@ import (
 
 var (
 	// BoldExp checks to see if the double underscore was used to denote bold for text
-	BoldExp = regexp.MustCompile(`(?m)(?:\_\_([\S]+[^\_\_|\s]*)\_\_){1}`)
+	BoldExp = regexp.MustCompile(`(?m)(?:\_\_([\S]+[^\_\_]*)\_\_)`)
 	// BoldSub is the html for bolding within group matching
 	BoldSub = "<b>$1</b>"
 	// StrikeExp is denoted by ~~strike through text~~

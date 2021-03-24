@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/braddschick/simpdf/internal"
 	"github.com/braddschick/simpdf/pkg/defaults"
@@ -22,6 +23,29 @@ func (s *SimPDF) AppendStyle(styles models.Styles) {
 // AddStyle replaces all styles with the supplied styles to the PDF document for usage by the developer.
 func (s *SimPDF) AddStyle(styles []models.Styles) {
 	s.Style = styles
+}
+
+// Details allows the adding of additional details for the PDF document.
+func (s *SimPDF) Details(title, auth, subject, keywords string) {
+	s.Title = title
+	s.Author = auth
+	s.Subject = subject
+	s.Keywords = keywords
+	s.CreationDate = time.Now().Local()
+	s.PDF.SetCreationDate(s.CreationDate)
+	if !IsDefault(s.Title) {
+		s.PDF.SetTitle(s.Title, true)
+	}
+	if !IsDefault(s.Author) {
+		s.PDF.SetAuthor(s.Author, true)
+		s.PDF.SetCreator(s.Author, true)
+	}
+	if !IsDefault(s.Subject) {
+		s.PDF.SetSubject(s.Subject, true)
+	}
+	if !IsDefault(s.Keywords) {
+		s.PDF.SetKeywords(s.Keywords, true)
+	}
 }
 
 // SetMargin sets the Margins for the PDF document.
@@ -94,7 +118,7 @@ func (s *SimPDF) SetPage(pageType string, isLandscape bool) {
 func (s *SimPDF) StyleName(name string) (models.Styles, error) {
 	var out models.Styles
 	for _, t := range s.Style {
-		if strings.ToLower(t.Name) == strings.ToLower(name) {
+		if strings.EqualFold(t.Name, name) {
 			out = t
 			break
 		}
@@ -220,14 +244,11 @@ func (s *SimPDF) StringWidth(text string) float64 {
 }
 
 // CheckBottom ensures that the bottom of the page including the bottom margin is not going to be passed.
+//
 // true equals it does pass the bottom of the page.
 // false equals it is not going to pass the bottom of the page.
 func (s *SimPDF) CheckBottom() bool {
-	cY := s.PDF.GetY()
-	if (cY + s.Margin.Bottom) > s.PageHeight() {
-		return true
-	}
-	return false
+	return (s.PDF.GetY() + s.Margin.Bottom) > s.PageHeight()
 }
 
 func (s *SimPDF) fontReset(style models.Styles) {
@@ -269,13 +290,54 @@ func (s *SimPDF) AddMargins(margin models.Margins) {
 	s.PDF.SetMargins(margin.Left, margin.Top, margin.Right)
 }
 
+// ResetMargins changes the margins back to the original as set at instantiation.
+func (s *SimPDF) ResetMargins() {
+	s.AddMargins(s.Margin)
+	s.PDF.SetLeftMargin(s.Margin.Left)
+	s.PDF.SetRightMargin(s.Margin.Right)
+}
+
+// WriteImageInset Allows for an image to be inset on the top left, tl, or at the top right, tr, as desired.
+func (s *SimPDF) WriteImageInset(styleType string, align models.Alignments, text, imgPosition string, image Images) {
+	pos := strings.Split(strings.ToLower(imgPosition), "")
+	var cX float64
+	s.AddNewLine(-1)
+	iWpt, iHpt := image.PointsSize()
+	if pos[1] == "r" || pos[1] == "l" {
+		if pos[1] == "r" {
+			tW := s.PageWidth()
+			cX = tW - (s.Margin.Right * 2) - iWpt
+			s.PDF.SetRightMargin((s.Margin.Right * 2) + iWpt)
+			s.PDF.SetX(cX)
+		} else {
+			cX = (s.Margin.Left * 2) + iWpt
+			s.PDF.SetLeftMargin(cX)
+			s.PDF.SetX(s.Margin.Left)
+		}
+	}
+	x, y := s.PDF.GetXY()
+	s.AddImageXY(image, x, y)
+	s.PDF.SetX(s.Margin.Left)
+	s.Write(styleType, align, text)
+	_, y2 := s.PDF.GetXY()
+	if y+iHpt > y2 {
+		style, _ := s.StyleName(styleType)
+		s.PDF.SetY(y + iHpt + (style.LineSize * 1.5))
+	}
+	s.AddNewLine(-1)
+	s.ResetMargins()
+}
+
 // WriteCenter centers the current position of X,Y coordinates in the PDF document and then writes
-// out the contents of text. align variable is "L" left, "C" center, or "R" right text alignment.
+// out the contents of text.
+//
+// Writes to the center of the page.
+// align variable is "L" left, "C" center, or "R" right text alignment.
 func (s *SimPDF) WriteCenter(styleType string, align models.Alignments, text string) {
-	y := s.PageWidth() / 2
 	style, _ := s.StyleName(styleType)
+	y := (s.PageHeight() / 2) - style.LineSize
 	// internal.IfError("WriteCenter public "+err.Error(), err, false)
-	s.PDF.SetY(y - (style.LineSize / 2))
+	s.PDF.SetY(y)
 	s.Write(styleType, align, text)
 }
 
@@ -306,14 +368,29 @@ func (s *SimPDF) Write(styleType string, align models.Alignments, text string) {
 
 // ChangePage changes the page size to the one set as page variable must be a models.Pages
 // object for ease of use and will use the Design units pt. Page dimensions should be PORTRAIT
-// by default. This is dictated by gofpdf.PDF .
+// by default. This is dictated by gofpdf.PDF
 func (s *SimPDF) ChangePage(page models.Pages) {
 	s.Page = page
 	s.PDF.AddPageFormat(page.ToPDFOrientation(), gofpdf.SizeType{Wd: page.Width, Ht: page.Height})
 }
 
+func (s *SimPDF) SetHeader() {
+	s.PDF.SetHeaderFunc(func() {
+		// s.PDF.SetX(s.Margin.Left)
+		// s.PDF.SetY(s.Margin.Top / 2)
+		Header.Write(s)
+	})
+}
+
+func (s *SimPDF) SetFooter() {
+	s.PDF.SetFooterFunc(func() {
+		s.PDF.SetX(s.Margin.Left)
+		s.PDF.SetY(s.Page.Height - s.Margin.Top - (s.Margin.Bottom / 2))
+		Footer.Write(s)
+	})
+}
+
 func (s *SimPDF) init(fontDirectory string) {
-	// s.PDF = gofpdf.New(s.Page.ToPDFOrientation(), "pt", s.Page.Size, "")
 	s.PDF = gofpdf.NewCustom(&gofpdf.InitType{
 		UnitStr:        "pt",
 		Size:           gofpdf.SizeType{Wd: s.Page.Width, Ht: s.Page.Height},

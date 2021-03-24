@@ -62,23 +62,39 @@ func (s *SimPDF) TableColumnWidth(table Tables) []float64 {
 	return iCols
 }
 
+// CheckNullHeaders looks at each Tables.Header string value to see if it is a length of less than 1.
+// If the header is the first header and is empty that is still okay and allowed. However, any others
+// are empty then the return is true and the Header Row will NOT be displayed.
+func (t *Tables) CheckNullHeaders() bool {
+	aF := false
+	for i, s := range t.Headers {
+		if len(s) < 1 && i != 0 {
+			aF = true
+			break
+		}
+	}
+	return aF
+}
+
 // AddTableHeader Adds the table header row to the PDF document. If fixWidth is not 0 then
 // all cells will be set to the fixed width of the fixWidth value.
 // This should NOT be used directly but is provided for context. Use AddTable() instead.
 func (s *SimPDF) AddTableHeader(table Tables, fixWidth float64) {
-	s.SetStyle(table.HeaderStyle, false)
-	for i, r := range table.Headers {
-		b := fmt.Sprintf("%g", table.HeaderStyle.Border.Width.Top)
-		var w float64
-		if fixWidth == 0 {
-			w = table.MaxColWidth[i]
-		} else {
-			w = fixWidth
+	if !table.CheckNullHeaders() {
+		s.SetStyle(table.HeaderStyle, false)
+		for i, r := range table.Headers {
+			b := fmt.Sprintf("%g", table.HeaderStyle.Border.Width.Top)
+			var w float64
+			if fixWidth == 0 {
+				w = table.MaxColWidth[i]
+			} else {
+				w = fixWidth
+			}
+			align, str := BreakTableAlignment(r)
+			s.PDF.CellFormat(w, table.HeaderStyle.LineSize, str, b, 0, align, true, 0, "")
 		}
-		align, str := BreakTableAlignment(r)
-		s.PDF.CellFormat(w, table.HeaderStyle.LineSize, str, b, 0, align, true, 0, "")
+		s.AddNewLine(table.HeaderStyle.LineSize)
 	}
-	s.AddNewLine(table.HeaderStyle.LineSize)
 }
 
 // AddTableRows Adds the table rows to the PDF document. If fixWidth is not 0 then

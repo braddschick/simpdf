@@ -1,6 +1,8 @@
 package simpdf
 
 import (
+	"time"
+
 	"github.com/braddschick/simpdf/pkg/models"
 	"github.com/jung-kurt/gofpdf"
 )
@@ -61,4 +63,6 @@ type SimPDF struct {
 	Keywords string
 	// Subject for the PDF document
 	Subject string
+	// CreationDate gets authomatically set by running
+	CreationDate time.Time
 }

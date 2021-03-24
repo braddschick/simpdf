@@ -35,10 +35,10 @@ func (a *Alignments) ToHTML() string {
 		return "<center>$1</center>"
 	}
 	if a.Left {
-		return "<left>$1</left>"
+		return "$1"
 	}
 	if a.Right {
 		return "<right>$1</right>"
 	}
-	return "<left>$1</left>"
+	return "$1"
 }

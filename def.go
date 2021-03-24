@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/braddschick/simpdf/internal"
 	"github.com/braddschick/simpdf/pkg/defaults"
@@ -30,14 +31,17 @@ func (s *SimPDF) Details(title, auth, subject, keywords string) {
 	s.Author = auth
 	s.Subject = subject
 	s.Keywords = keywords
+	s.CreationDate = time.Now().Local()
+	s.PDF.SetCreationDate(s.CreationDate)
 	if !IsDefault(s.Title) {
 		s.PDF.SetTitle(s.Title, true)
 	}
 	if !IsDefault(s.Author) {
 		s.PDF.SetAuthor(s.Author, true)
+		s.PDF.SetCreator(s.Author, true)
 	}
 	if !IsDefault(s.Subject) {
-		s.PDF.SetAuthor(s.Subject, true)
+		s.PDF.SetSubject(s.Subject, true)
 	}
 	if !IsDefault(s.Keywords) {
 		s.PDF.SetKeywords(s.Keywords, true)
@@ -370,8 +374,23 @@ func (s *SimPDF) ChangePage(page models.Pages) {
 	s.PDF.AddPageFormat(page.ToPDFOrientation(), gofpdf.SizeType{Wd: page.Width, Ht: page.Height})
 }
 
+func (s *SimPDF) SetHeader() {
+	s.PDF.SetHeaderFunc(func() {
+		// s.PDF.SetX(s.Margin.Left)
+		// s.PDF.SetY(s.Margin.Top / 2)
+		Header.Write(s)
+	})
+}
+
+func (s *SimPDF) SetFooter() {
+	s.PDF.SetFooterFunc(func() {
+		s.PDF.SetX(s.Margin.Left)
+		s.PDF.SetY(s.Page.Height - s.Margin.Top - (s.Margin.Bottom / 2))
+		Footer.Write(s)
+	})
+}
+
 func (s *SimPDF) init(fontDirectory string) {
-	// s.PDF = gofpdf.New(s.Page.ToPDFOrientation(), "pt", s.Page.Size, "")
 	s.PDF = gofpdf.NewCustom(&gofpdf.InitType{
 		UnitStr:        "pt",
 		Size:           gofpdf.SizeType{Wd: s.Page.Width, Ht: s.Page.Height},

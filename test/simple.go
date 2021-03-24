@@ -15,8 +15,20 @@ func main() {
 	// defaults.BasicStyle contains the styles to be used in the document you can create your own
 	// defaults.Narrow_Margins is the margin information for the document
 	// "" if you want to use custom fonts this will be the custom font directory path
-	defaults.BasicStyle[5].Font.Name = "courier"
+	// defaults.BasicStyle[5].Font.Name = "courier"
 	pdf.Start("Letter", false, defaults.BasicStyle, defaults.Narrow_Margins, "")
+	pdf.Details("Testing Functions", "Author", "Testing Subject", "More Keywords, here, here")
+	simpdf.Header.LeftContent.Text = pdf.Title
+	simpdf.Header.LeftContent.Style = defaults.Basic_Table
+	bold := defaults.Basic_Table
+	bold.TextVariant.Bold = true
+	simpdf.Header.RightContent.Style = bold
+	simpdf.Header.RightContent.PageNumber = true
+	simpdf.Header.RightContent.Text = "|"
+	pdf.SetHeader()
+	simpdf.Footer.CenterContent.Style = defaults.Basic_Table
+	simpdf.Footer.CenterContent.Text = "CONFIDENTIAL"
+	pdf.SetFooter()
 	l := &models.Alignments{Left: true}
 	// pdf.WriteCenter writes in the center of the document great for title pages
 	// "Title" denotes the style of text to be used. This is the name of the models.Style to utilize

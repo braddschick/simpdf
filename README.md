@@ -1,3 +1,5 @@
+![SimPDF](./test/images/simpdf.png)
+
 # SimPDF
 
 Simplify gofpdf.Fpdf document generation with with this wrapper for use in golang.
@@ -13,7 +15,7 @@ in this package to make life easier from making a simple automated report or som
 
 ## Things are different here
 
-Once you look at this package contents you will see things are different here. That doesn't mean they are bad just they are different.
+Once you look at this package contents you will see things are different here. That doesn't mean they are bad, just different.
 
 ## Examples
 

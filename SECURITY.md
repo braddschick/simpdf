@@ -10,7 +10,7 @@ All versions are supported for Security related updates and resolutions.
 
 ## Reporting a Vulnerability
 
-If a vulnerabilty is found please email Bradd Schick.
+If a vulnerability is found please email Bradd Schick.
 
 The email should contain at a minimum the following information:
 - Vulnerability

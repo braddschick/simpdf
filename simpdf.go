@@ -14,25 +14,25 @@ type Doc interface {
 	AddImageStandardPosition(image Images, stdPosition string)
 	AddImageXY(image Images, x, y float64)
 	AddMargins(margin models.Margins)
-	AddNewLine()
-	AddPageBreak()
 	AddStyle(style []models.Styles)
 	AddTable(tab Tables, altRowColor models.Styles, fixedWidth float64)
 	AddTableHeader(table Tables, fixWidth float64)
 	AddTableRows(table Tables, fixWidth float64)
 	AppendStyle(style models.Styles)
-	ChangeFont(style models.Styles)
-	ChangePage(page models.Pages)
+	Break()
+	Font(style models.Styles)
+	NewPage(page models.Pages)
 	CheckBottom() bool
 	DistributeColumnsEvenly(numCols float64) float64
 	DrawBottomLine(style models.Styles)
 	Finish(fileOutput string)
-	HeadingStart(styleType, text string)
 	HeadingEnd(styleType string)
-	PageHeight() float64
-	PageWidth() float64
+	HeadingStart(styleType, text string)
+	NewLine()
+	Height() float64
+	Width() float64
 	Parser(style string, align models.Alignments, text string) string
-	SetFont(fontFilePath string) error
+	NewFont(fontFilePath string) error
 	SetMargin(margin models.Margins)
 	SetPage(pageType string, isLandscape bool)
 	SetStyle(style models.Styles, fontOnly bool)
@@ -41,8 +41,8 @@ type Doc interface {
 	StringWidth(text string) float64
 	StyleName(name string) (models.Styles, error)
 	TableColumnWidth(table Tables) []float64
-	WriteCenter(styleType, align models.Alignments, text string)
 	Write(styleType, align models.Alignments, text string)
+	WriteCenter(styleType, align models.Alignments, text string)
 }
 
 // SimPDF struct is the main object for the Simple PDF package.

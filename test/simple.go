@@ -39,17 +39,17 @@ func main() {
 	// This is identical to pdf.WriteCenter for arguments
 	pdf.Write("Subtitle", *l, "subtitle style")
 	// pdf.AddPageBreak creates a new Page Break for the document
-	pdf.AddPageBreak()
+	pdf.Break()
 	pdf.Write("Heading 1", *l, "Heading One")
-	pdf.Write("Normal", *l, "This is normal text and again can be styled very easily. This has a left alignment added to it. Also, remember the _*gofpdf.Pdf*_ is always accesible through _*SimPDF.PDF*_.")
-	pdf.AddNewLine(0)
-	pdf.Write("", models.Alignments{}, "This has no aligment noted and will appear as the default \"left\" alignment. This also has no models.Style.Name provided and will utilize the \"Normal\" style located in the styles provided earlier.")
+	pdf.Write("Normal", *l, "This is normal text and again can be styled very easily. This has a left alignment added to it. Also, remember the _*gofpdf.Pdf*_ is always accessible through _*SimPDF.PDF*_.")
+	pdf.NewLine(0)
+	pdf.Write("", models.Alignments{}, "This has no alignment noted and will appear as the default \"left\" alignment. This also has no models.Style.Name provided and will utilize the \"Normal\" style located in the styles provided earlier.")
 	pdf.Write("Heading 2", *l, "Heading Level Two")
 	pdf.Write("Heading 3", *l, "Heading Level Three")
 	goImage, _ := simpdf.NewImage("./images/golang.png", 355, 486)
 	pdf.AddImageStandardPosition(goImage, "bc")
 	// Manual page break
-	pdf.AddPageBreak()
+	pdf.Break()
 	// Demonstrates the use of inline Bold (__text__), Underline (_#text#_), and Italics (_*text*_)
 	pdf.Write("Normal", *l, "Here is formatted text. __Bolded text here__ then we have _#underlined text#_ but you also need to have _*italic text as well*_. This makes it very easy to use text vairants within in texts.")
 	// Tables can have alternating row styles
@@ -79,7 +79,7 @@ func main() {
 	pdf.AddTable(table, altRow, 140)
 	pdf.Write("", *l, "This is a simple table with _*Ditstribute Evenly column width*_.")
 	pdf.AddTable(table, altRow, pdf.DistributeColumnsEvenly(3))
-	pdf.AddPageBreak()
+	pdf.Break()
 	pdf.Write("", *l, "Also, tables do not have to have header rows if they are not needed. Just add empty strings to the Tables.Headers string list to ensure the column count is the same.")
 	pdf.Write("", *l, "* Note the first column header __CAN__ be blank if required by your table.")
 	table.Headers = []string{"", "", ""}
@@ -88,7 +88,7 @@ func main() {
 	goImage.ChangeHeight(150)
 	pdf.AddImageCurrent(goImage)
 	// Adding the Images.Height to simpdf.AddNewLine() ensures there is no text being added on top of the image since I placed it at the current X, Y position.
-	pdf.AddNewLine(goImage.Height)
+	pdf.NewLine(goImage.Height)
 	pdf.Write("Normal", *l, "Adding an image to a \"Standard Position\" is easy as well. Top Left, _#tl#_, or Top Center, _#tc#_, or Top Right, _#tr#_, and is also available in Center or Bottom variations.")
 	goImage.ChangeWidth(75)
 	pdf.WriteImageInset("Normal", *l, "This needs to have margin left away from the image, but also look decent. _#However#_, I need to ensure it continues with a line break which is why this is so long.", "tl", goImage)

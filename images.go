@@ -82,9 +82,9 @@ func (s *SimPDF) AddImageXY(image Images, x, y float64) {
 // of the document. If a new line has been placed any padding has been removed.
 func (s *SimPDF) AddImageCurrent(image Images) {
 	x, y := s.PDF.GetXY()
-	width := s.PageWidth()
+	width := s.Width()
 	if (s.Margin.Left+s.Margin.Right)+(x+image.Width) > width {
-		s.AddNewLine(0)
+		s.NewLine(0)
 		x, y = s.PDF.GetXY()
 	} else {
 		x = x + 3

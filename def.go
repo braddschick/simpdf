@@ -3,6 +3,7 @@ package simpdf
 import (
 	"errors"
 	"fmt"
+	"image/color"
 	"log"
 	"os"
 	"path/filepath"
@@ -295,6 +296,11 @@ func (s *SimPDF) ResetMargins() {
 	s.AddMargins(s.Margin)
 	s.PDF.SetLeftMargin(s.Margin.Left)
 	s.PDF.SetRightMargin(s.Margin.Right)
+}
+
+// Box allows for Drawing a Box with the given starting point and width/height
+func (s *SimPDF) Box(outline, fill color.Color, x, y, w, h float64) {
+
 }
 
 // WriteImageInset Allows for an image to be inset on the top left, tl, or at the top right, tr, as desired.
